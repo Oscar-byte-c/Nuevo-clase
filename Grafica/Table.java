@@ -1,12 +1,20 @@
 package Grafica;
 
+import ficheros.clases.Escritura;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 
-public class Table extends JFrame{
+public class Table extends JFrame {
     private JPanel Panel3;
     private JTable tablaMaterias;
+    private JButton btnGuardar;
 
 
     public Table() {
@@ -16,10 +24,41 @@ public class Table extends JFrame{
         setContentPane(Panel3);
         setLocationRelativeTo(null);
         Panel3 = new JPanel();
-        Panel3.add(new JLabel());
         cargarTablaMaterias();
+        btnGuardar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Escritura es = new Escritura();
+                JOptionPane.showMessageDialog(null,"Archivo guardado correctamente","Horario",JOptionPane.INFORMATION_MESSAGE);
+                es.escribirFichero(extraerDatos(tablaMaterias),"C:/Users/POO/Documents/POO/Horario.csv");
+//                System.out.println(extraerDatos(tablaMaterias));
+            }
+        });
+
+
+
 
     }
+
+    public String extraerDatos(JTable Table) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int col = 0; col < tablaMaterias.getColumnCount(); col++) {
+            sb.append(tablaMaterias.getColumnName(col));
+            if (col < tablaMaterias.getColumnCount() - 1) sb.append(",");
+        }
+        sb.append("\n");
+        for (int row = 0; row < tablaMaterias.getRowCount(); row++) {
+            for (int col = 0; col < tablaMaterias.getColumnCount(); col++) {
+                Object value = tablaMaterias.getValueAt(row, col);
+                sb.append(value != null ? value.toString() : "");
+                if (col < tablaMaterias.getColumnCount() - 1) sb.append(",");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 
     private  void cargarTablaMaterias() {
         String[] columnas = {"","Lunes", "Martes", "Miercoles","Jueves","Viernes"};
@@ -38,6 +77,17 @@ public class Table extends JFrame{
         DefaultTableModel modelo = new DefaultTableModel(datos, columnas);
         tablaMaterias.setModel(modelo);
     }
+    public void escribirFichero(String info, String ruta) {
+        try (FileWriter fichero = new FileWriter(ruta)) {
+            PrintWriter pw = new PrintWriter(fichero);
+
+            pw.println(info);
+            System.out.println("Archivo creado exitosamnente");
+        } catch (IOException e) {
+            System.out.println("Error al escribir el archivo: " + e.getMessage());
+        }
+
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -45,4 +95,6 @@ public class Table extends JFrame{
             tabl.setVisible(true);
         });
     }
+
+
 }
